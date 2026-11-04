@@ -1,0 +1,92 @@
+body {
+    margin: 0;
+    font-family: system-ui;
+    background: #05070a;
+    color: white;
+}
+
+/* Panel HUD superior */
+.hud {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    background: #081827e8;
+    border: 1px solid #3a7890;
+    border-radius: 12px;
+    padding: 14px;
+    max-width: 320px;
+    box-shadow: 0 8px 30px #0008;
+}
+
+.hud h2 {
+    margin: 0 0 6px;
+    color: #63e5ff;
+    font-size: 18px;
+}
+
+.hud p {
+    margin: 5px 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.hud button,
+.hud a {
+    display: inline-block;
+    background: #15576b;
+    color: white;
+    border: 1px solid #65bdd0;
+    border-radius: 7px;
+    padding: 7px 10px;
+    margin: 5px 4px 0 0;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.hud button:focus-visible,
+.hud a:focus-visible {
+    outline: 3px solid yellow;
+}
+
+/* Panel inferior informativo (.info) */
+.info {
+    position: fixed;
+    bottom: 15px;
+    left: 12px;
+    z-index: 10;
+    background: #091928ed;
+    border-radius: 9px;
+    padding: 12px;
+    max-width: 350px;
+    font-size: 14px;
+    border: 1px solid #2a5a70;
+}
+
+.info strong {
+    color: #69e7ff;
+}
+
+.small {
+    font-size: 12px;
+    color: #c7dce6;
+    margin-top: 4px;
+}
+
+/* Ocultar elementos */
+.hide {
+    display: none !important;
+}
+
+/* Posición limpia de FPS a la derecha */
+.rs-base {
+    position: fixed !important;
+    top: 12px !important;
+    right: 12px !important;
+    left: auto !important;
+    z-index: 99999 !important;
+    background: rgba(8, 24, 39, 0.95) !important;
+    border-radius: 8px;
+    border: 1px solid #3a7890;
+}

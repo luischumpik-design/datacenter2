@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Datos VR - Adler Vega</title>
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+    <!-- Componente interactivo info-rack aplicado directamente a los modelos GLB de los racks -->
+    <script>
+        AFRAME.registerComponent('info-rack', {
+            schema: {
+                titulo:  { type: 'string', default: 'RACK' },
+                detalle: { type: 'string', default: '' },
+                estado:  { type: 'string', default: 'ok' }
+            },
+            init: function () {
+                const el = this.el;
+                el.classList.add('interactive');
+
+                // Panel 3D flotante sobre el modelo GLB del rack
+                const panel = document.createElement('a-entity');
+                panel.setAttribute('geometry', 'primitive: plane; width: 1.6; height: 0.8');
+                panel.setAttribute('material', 'color: #071b29; opacity: 0.95; side: double');
+                panel.setAttribute('position', '0 2.55 0');
+                panel.setAttribute('visible', false);
+                el.appendChild(panel);
+
+                el.addEventListener('click', function () {
+                    const attrData = el.getAttribute('info-rack') || {};
+                    const tituloText = attrData.titulo || 'RACK';
+                    const detalleText = attrData.detalle || 'ACTIVO';
+                    const estadoVal = attrData.estado || 'ok';
+
+                    // Actualizar texto de la tarjeta 3D flotante
+                    panel.setAttribute('text', {
+                        value: tituloText + '\n' + detalleText,
+                        color: (estadoVal === 'falla') ? '#ff4444' : '#63e5ff',
+                        align: 'center',
+                        width: 1.3
+                    });
+                    panel.setAttribute('visible', !panel.getAttribute('visible'));
+
+                    // Actualizar el panel de información abajo a la izquierda (.info)
+                    const panelInfo = document.getElementById('detalle');
+                    if (panelInfo) {
+                        panelInfo.classList.remove('hide');
+                        const colorEstado = (estadoVal === 'falla') ? '#ff2222' : '#00ff55';
+                        panelInfo.innerHTML = '<strong>' + tituloText + '</strong>' +
+                            '<p>' + detalleText + '</p>' +
+                            '<p>Estado simulado: <span style="color:' + colorEstado + '; font-weight:bold">' + estadoVal.toUpperCase() + '</span></p>' +
+                            '<p class="small">Monitoreo activo del sistema.</p>';
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Hoja de estilos externa -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ===== INTERFAZ HUD SUPERIOR ORIGINAL ===== -->
+    <div class="hud">
+        <h2>ESPOCH | Centro de Datos VR</h2>
+        <p>W A S D: caminar · Ratón: mirar · Clic o punto central: seleccionar rack.</p>
+        <p>8 racks · CRAC · piso técnico · alarma · 3 modelos GLB</p>
+        <a href="ar.html" target="_blank">Abrir realidad aumentada</a>
+        <button type="button" id="gaze">Activar mirada 1,5 s</button>
+        <button type="button" id="stats">Mostrar / ocultar FPS</button>
+        <button type="button" id="reset">Volver a entrada</button>
+    </div>
+
+    <!-- Panel de información abajo a la izquierda -->
+    <div class="info" id="detalle">
+        <strong>Bienvenido al laboratorio - Adler Vega</strong>
+        <p>Seleccione un rack para consultar su función y estado. Busque el equipo con FALLA.</p>
+        <p class="small">Simulación educativa. Use un navegador compatible con WebXR para entrar en VR.</p>
+    </div>
+
+    <!-- ===== ESCENA 3D ===== -->
+    <a-scene background="color: #05070a">
+
+        <!-- Assets de los modelos 3D GLB (incluyendo rack.glb) -->
+        <a-assets>
+            <a-asset-item id="rack-glb"       src="Models/rack.glb"></a-asset-item>
+            <a-asset-item id="servidores-glb" src="Models/servers.glb"></a-asset-item>
+            <a-asset-item id="escritorio-glb" src="Models/escritorio.glb"></a-asset-item>
+            <a-asset-item id="router-glb"     src="Models/wifi_router.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- ===== PUERTA DE ACCESO ===== -->
+        <a-box position="0 1 1.91" width="1.2" height="2" depth="0.04" color="#5a3818"></a-box>
+        <a-sphere position="0.43 1 1.81" radius="0.055" color="#f5c542"></a-sphere>
+        <a-text
+            value="ACCESO AL CENTRO DE DATOS"
+            position="0 2.35 1.78"
+            rotation="0 180 0"
+            align="center"
+            width="3"
+            color="#ffffff">
+        </a-text>
+
+        <!-- ===== UNIDAD DE CLIMATIZACIÓN CRAC ===== -->
+        <a-box position="-3 0.9 1.5"  width="1.2"  height="1.8"  depth="0.8"  color="#7a8395"></a-box>
+        <a-box position="-3 1.35 1.09" width="0.9" height="0.3"  depth="0.02" color="#1a2836"></a-box>
+        <a-box position="-3 0.65 1.09" width="0.95" height="0.6" depth="0.02" color="#3c4956"></a-box>
+        <a-text
+            value="CRAC - CLIMATIZACION"
+            position="-3 2 1.05"
+            rotation="0 180 0"
+            align="center"
+            width="2.3"
+            color="#00e5ff">
+        </a-text>
+
+        <!-- ===== PISO ===== -->
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="8" height="12" color="#3b526d"></a-plane>
+
+        <!-- ===== CUADRÍCULA DEL PISO ===== -->
+        <a-box position="-3 0.012 -4" width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+        <a-box position="-2 0.012 -4" width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+        <a-box position="-1 0.012 -4" width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -4"  width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+        <a-box position="1 0.012 -4"  width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+        <a-box position="2 0.012 -4"  width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+        <a-box position="3 0.012 -4"  width="0.012" height="0.012" depth="12" color="#6c7d93"></a-box>
+
+        <a-box position="0 0.012 1"  width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 0"  width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -1" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -2" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -3" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -4" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -5" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -6" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -7" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -8" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+        <a-box position="0 0.012 -9" width="8" height="0.012" depth="0.012" color="#6c7d93"></a-box>
+
+        <!-- ===== PAREDES ===== -->
+        <a-box position="0 1.5 -10" width="8"   height="3" depth="0.2" color="#1a3554"></a-box>
+        <a-box position="0 1.5 2"   width="8"   height="3" depth="0.2" color="#1a3554"></a-box>
+        <a-box position="-4 1.5 -4" width="0.2" height="3" depth="12"  color="#1a3554"></a-box>
+        <a-box position="4 1.5 -4"  width="0.2" height="3" depth="12"  color="#1a3554"></a-box>
+
+        <!-- ===== TECHO ===== -->
+        <a-plane position="0 3 -4" rotation="90 0 0" width="8" height="12" color="#14283d"></a-plane>
+
+        <!-- ===== ILUMINACIÓN ===== -->
+        <a-entity light="type: ambient; intensity: 0.4"></a-entity>
+        <a-entity light="type: point; intensity: 0.8; color: #aaddff" position="0 2.8 -4"></a-entity>
+
+        <!-- ===== TÍTULO EN PARED ===== -->
+        <a-text
+            value="CENTRO DE DATOS - ADLER VEGA"
+            position="0 2.3 -9.7"
+            align="center"
+            width="6"
+            color="#00e5ff">
+        </a-text>
+
+        <!-- ===== LOS 8 RACKS UTILIZANDO EL MODELO GLB CON INTERACCIÓN ===== -->
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 01; detalle: SERVIDORES WEB - ACTIVO; estado: ok" position="-1.6 0 -2" rotation="0 90 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 02; detalle: BASE DE DATOS - ACTIVO; estado: ok" position="-1.6 0 -4" rotation="0 90 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 03; detalle: MONITOREO - ACTIVO; estado: ok" position="-1.6 0 -6" rotation="0 90 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 04; detalle: RESPALDO - ACTIVO; estado: ok" position="-1.6 0 -8" rotation="0 90 0" scale="1 1 1"></a-gltf-model>
+
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 05; detalle: ALMACENAMIENTO - FALLA; estado: falla" position="1.6 0 -2" rotation="0 -90 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 06; detalle: CLOUD - ACTIVO; estado: ok" position="1.6 0 -4" rotation="0 -90 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 07; detalle: APPS - ACTIVO; estado: ok" position="1.6 0 -6" rotation="0 -90 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#rack-glb" info-rack="titulo: RACK 08; detalle: STORAGE - ACTIVO; estado: ok" position="1.6 0 -8" rotation="0 -90 0" scale="1 1 1"></a-gltf-model>
+
+        <!-- ===== OTROS MODELOS 3D GLB ===== -->
+        <a-gltf-model src="#servidores-glb" position="-2.85 0.12 -1.25" rotation="0 0 0" scale="1.6 1.6 1.6"></a-gltf-model>
+        <a-gltf-model src="#escritorio-glb" position="2.8 0.786 1.1" rotation="0 0.1 0" scale="1 1 1"></a-gltf-model>
+        <a-gltf-model src="#router-glb"     position="3.35 1.60 1.5" rotation="0 180 0" scale="1.4 1.4 1.4"></a-gltf-model>
+
+        <!-- ===== CÁMARA ===== -->
+        <a-camera position="0 1.6 1">
+            <a-cursor raycaster="objects: .interactive" fuse="false" color="#5fe9ff"></a-cursor>
+        </a-camera>
+
+    </a-scene>
+
+    <!-- ===== LÓGICA DE LOS BOTONES ===== -->
+    <script>
+        document.getElementById('reset').addEventListener('click', function () {
+            const panelInfo = document.getElementById('detalle');
+            panelInfo.classList.remove('hide');
+            panelInfo.innerHTML = '<strong>Bienvenido al laboratorio - Adler Vega</strong>' +
+                '<p>Seleccione un rack para consultar su función y estado. Busque el equipo con FALLA.</p>' +
+                '<p class="small">Simulación educativa. Use un navegador compatible con WebXR para entrar en VR.</p>';
+        });
+
+        let fuseOn = false;
+        document.getElementById('gaze').addEventListener('click', function () {
+            const cursor = document.querySelector('a-cursor');
+            fuseOn = !fuseOn;
+            cursor.setAttribute('fuse', fuseOn);
+            if (fuseOn) {
+                cursor.setAttribute('fuse-timeout', 1500);
+                this.style.background = '#28a745';
+            } else {
+                this.style.background = '#15576b';
+            }
+        });
+
+        document.getElementById('stats').addEventListener('click', function () {
+            const scene = document.querySelector('a-scene');
+            if (scene.hasAttribute('stats')) {
+                scene.removeAttribute('stats');
+                this.style.background = '#15576b';
+            } else {
+                scene.setAttribute('stats', '');
+                this.style.background = '#28a745';
+            }
+        });
+    </script>
+
+</body>
+</html>
